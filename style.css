@@ -1,0 +1,395 @@
+/* Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #a8e6cf, #dcedc1);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.game-container {
+    width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #004d40;
+}
+
+button {
+    padding: 10px 20px;
+    background: #00897b;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #00695c;
+}
+
+#intro-screen button {
+    margin: 5px;
+}
+
+/* Character Selection */
+.character-selection {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.character-option {
+    margin: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.avatar {
+    width: 100px;
+    height: 150px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+/* Avatar Customization */
+:root {
+    --avatar-color: #ff0000; /* Default color */
+}
+
+/* Knight Avatar */
+.knight::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 80px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 10px;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.knight::after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 50px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 35px;
+}
+
+/* Wizard Avatar */
+.wizard::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 80px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 10px;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.wizard::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 50px solid var(--avatar-color);
+    position: absolute;
+    top: 0;
+    left: 20px;
+}
+
+/* Explorer Avatar */
+.explorer::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 80px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 10px;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.explorer::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 20px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 50%;
+    position: absolute;
+    top: 20px;
+    left: 30px;
+}
+
+/* Elf Avatar */
+.elf::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 80px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 10px;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.elf::after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 50px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 35px;
+}
+
+/* Fairy Avatar */
+.fairy::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 80px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 10px;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+}
+
+.fairy::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 50px;
+    background: var(--avatar-color);
+    border: 2px solid #000000;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 25px;
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+    margin-bottom: 5px;
+}
+
+.progress {
+    height: 100%;
+    background-color: #4caf50;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.progress-info span {
+    flex: 1;
+    text-align: center;
+}
+
+/* Game Area */
+.game-area {
+    display: flex;
+    justify-content: space-between;
+}
+
+.map {
+    width: 40%;
+    height: 400px;
+    background: #c8e6c9;
+    border: 2px solid #388e3c;
+    border-radius: 10px;
+    position: relative;
+    background-image: url('images/forest-map.png');
+    background-size: cover;
+}
+
+#progress-marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: url('images/player-marker.png');
+    background-size: contain;
+    transition: left 0.5s, top 0.5s;
+}
+
+.interaction-area {
+    width: 55%;
+    text-align: left;
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #004d40;
+    border-radius: 10px;
+}
+
+.creature {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.creature::before {
+    content: '';
+    width: 100px;
+    height: 100px;
+    background: #ffe0b2;
+    border: 2px solid #ffab40;
+    border-radius: 50%;
+    position: absolute;
+}
+
+/* Animations */
+@keyframes correctAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes incorrectAnimation {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.animate-correct {
+    animation: correctAnimation 0.5s;
+}
+
+.animate-incorrect {
+    animation: incorrectAnimation 0.5s;
+}
+
+#question {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#answer {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#feedback {
+    height: 20px;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+#feedback.green {
+    color: green;
+}
+
+#feedback.red {
+    color: red;
+}
+
+/* Game Buttons */
+.game-buttons {
+    margin-top: 10px;
+}
+
+.game-buttons button {
+    margin-right: 10px;
+    padding: 8px 16px;
+    background: #00897b;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.game-buttons button:hover {
+    background: #00695c;
+}
+
+/* End Screen */
+#end-screen h2 {
+    color: #004d40;
+}
+
+#end-screen p {
+    font-size: 20px;
+}
+
+/* Achievements */
+#achievements {
+    margin-top: 20px;
+}
+
+#achievements h3 {
+    color: #004d40;
+}
+
+#achievement-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#achievement-list li {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+/* Leaderboard Styles */
+#leaderboard {
+    margin-top: 20px;
+}
+
+#leaderboard h3 {
+    color: #004d40;
+}
+
+#leaderboard-entries p {
+    font-size: 18px;
+    margin: 5px 0;
+}
