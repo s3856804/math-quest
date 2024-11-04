@@ -27,9 +27,23 @@ const tryAgainMessages = [
     'Give it another try!',
 ];
 
-// Sound elements
-let correctSound = new Audio('sounds/correct.mp3');
-let incorrectSound = new Audio('sounds/incorrect.mp3');
+// Function to play sound using Web Audio API
+function playSound(frequency, type = 'sine', duration = 0.2) {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+}
 
 function goToCharacterSelection() {
     document.getElementById('intro-screen').style.display = 'none';
@@ -40,7 +54,6 @@ function selectCharacter(selectedCharacter) {
     character = selectedCharacter;
     playerName = document.getElementById('player-name').value.trim() || 'Adventurer';
 
-    // Get the selected color
     const avatarColor = document.getElementById('avatar-color').value;
     document.documentElement.style.setProperty('--avatar-color', avatarColor);
 
@@ -62,17 +75,14 @@ function generateQuestion(isGoingBack = false) {
         currentQuestionIndex++;
     }
 
-    // Check if we need to generate new set of questions for next level
     if (currentQuestionIndex >= totalQuestions) {
         currentQuestionIndex = 0;
         levelUp();
     }
 
-    // Generate new question
     const creatures = ['Rabbit', 'Owl', 'Fox', 'Squirrel', 'Deer'];
     const creature = creatures[Math.floor(Math.random() * creatures.length)];
 
-    // Display creature (using CSS)
     const creatureElement = document.getElementById('creature');
     creatureElement.innerHTML = '';
     creatureElement.className = 'creature';
@@ -81,26 +91,21 @@ function generateQuestion(isGoingBack = false) {
     let operator = getOperator(level);
     let num1, num2;
 
-    // Adjust number generation based on operator
     if (operator === '×') {
-        // Limit multiplication to one-digit numbers (1-9)
         num1 = getRandomNumber(1, 9);
         num2 = getRandomNumber(1, 9);
     } else if (operator === '÷') {
-        // For division, ensure divisor is one-digit and result is whole number
         num2 = getRandomNumber(1, 9);
         let temp = getRandomNumber(level);
         num1 = num2 * temp;
     } else {
-        // For addition and subtraction, use numbers based on level
         num1 = getRandomNumber(level);
         num2 = getRandomNumber(level);
     }
 
-    // Adjust numbers for subtraction to ensure non-negative results
     if (operator === '-') {
         if (num1 < num2) {
-            [num1, num2] = [num2, num1]; // Swap numbers
+            [num1, num2] = [num2, num1];
         }
     }
 
@@ -116,27 +121,21 @@ function generateQuestion(isGoingBack = false) {
         operator: operator
     };
 
-    // Store the question in history
     questionHistory[currentQuestionIndex] = { ...currentQuestion };
 
-    // Update progress info
     updateProgress();
 
-    // Display the question
     document.getElementById('question').textContent = currentQuestion.question;
     document.getElementById('answer').value = currentQuestion.userAnswer || '';
     document.getElementById('feedback').textContent = '';
 
-    // Focus on the answer input field
     const answerInput = document.getElementById('answer');
     answerInput.focus();
 
-    // Add event listener for the Enter key
     answerInput.removeEventListener('keydown', handleKeyDown);
     answerInput.addEventListener('keydown', handleKeyDown);
 }
 
-// Function to handle keydown event
 function handleKeyDown(event) {
     if (event.key === 'Enter') {
         submitAnswer();
@@ -145,10 +144,8 @@ function handleKeyDown(event) {
 
 function getRandomNumber(level, maxNumber = null) {
     if (maxNumber !== null) {
-        // Generate number between 1 and maxNumber (inclusive)
         return Math.floor(Math.random() * maxNumber) + 1;
     } else {
-        // Generate number based on level
         let max = level * 10;
         return Math.floor(Math.random() * max) + 1;
     }
@@ -157,10 +154,10 @@ function getRandomNumber(level, maxNumber = null) {
 function getOperator(level) {
     let operators = ['+', '-'];
     if (level >= 2) {
-        operators.push('×'); // Introduce multiplication at level 2
+        operators.push('×');
     }
     if (level >= 3) {
-        operators.push('÷'); // Introduce division at level 3
+        operators.push('÷');
     }
     return operators[Math.floor(Math.random() * operators.length)];
 }
@@ -188,21 +185,19 @@ function submitAnswer() {
             currentQuestion.isCorrect = true;
             currentQuestion.isAnswered = true;
 
-            // Collect gems
             gemsCollected++;
             document.getElementById('gems').textContent = gemsCollected;
 
-            // Check achievements
+            playSound(440, 'sine', 0.3);
+
             checkAchievements();
 
-            // Check if it's time to level up
             if (gemsCollected % gemsPerLevel === 0) {
                 levelUp();
             }
         }
         incorrectAttempts = 0;
         displayFeedback('Correct!', true);
-        // Proceed to next question
         generateQuestion();
     } else {
         if (!currentQuestion.isAnswered || !currentQuestion.isCorrect) {
@@ -213,14 +208,16 @@ function submitAnswer() {
             currentQuestion.isAnswered = true;
         }
         incorrectAttempts++;
+
+        playSound(220, 'sawtooth', 0.3);
+
         displayFeedback('Try again!', false);
         if (incorrectAttempts >= 3) {
             displayHint();
-            incorrectAttempts = 0; // Reset attempts after providing hint
+            incorrectAttempts = 0;
         }
     }
 
-    // Update progress info
     updateProgress();
 }
 
@@ -231,20 +228,6 @@ function displayFeedback(message, isCorrect) {
         : tryAgainMessages[Math.floor(Math.random() * tryAgainMessages.length)];
     feedbackEl.textContent = randomMessage;
     feedbackEl.className = isCorrect ? 'green' : 'red';
-    playSound(isCorrect);
-    // Add animations
-    const creatureElement = document.getElementById('creature');
-    creatureElement.classList.remove('animate-correct', 'animate-incorrect');
-    void creatureElement.offsetWidth; // Trigger reflow
-    creatureElement.classList.add(isCorrect ? 'animate-correct' : 'animate-incorrect');
-}
-
-function playSound(isCorrect) {
-    if (isCorrect) {
-        correctSound.play();
-    } else {
-        incorrectSound.play();
-    }
 }
 
 function displayHint() {
@@ -252,19 +235,16 @@ function displayHint() {
 }
 
 function updateProgress() {
-    // Update progress info
     document.getElementById('correct-answers').textContent = correctAnswers;
     document.getElementById('incorrect-answers').textContent = incorrectAnswers;
     document.getElementById('remaining-questions').textContent = totalQuestions - currentQuestionIndex - 1;
 
-    // Update progress bar
     const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
     document.getElementById('progress').style.width = progressPercentage + '%';
 }
 
 function goBack() {
     if (currentQuestionIndex > 0) {
-        // Adjust counts if necessary
         if (currentQuestion.isAnswered) {
             if (currentQuestion.isCorrect) {
                 correctAnswers--;
@@ -358,7 +338,7 @@ function saveHighScore(name, score) {
     let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     highScores.push({ name: name, score: score });
     highScores.sort((a, b) => b.score - a.score);
-    highScores = highScores.slice(0, 5); // Keep top 5
+    highScores = highScores.slice(0, 5);
     localStorage.setItem('highScores', JSON.stringify(highScores));
 }
 
@@ -374,7 +354,6 @@ function displayHighScores() {
 }
 
 function restartGame() {
-    // Reset game variables
     character = '';
     playerName = '';
     level = 1;
@@ -388,9 +367,7 @@ function restartGame() {
     incorrectAnswers = 0;
     achievements = [];
     miniGamePlayed = false;
-    // Clear saved game
     localStorage.removeItem('savedGame');
-    // Reset screens
     document.getElementById('end-screen').style.display = 'none';
     document.getElementById('intro-screen').style.display = 'block';
     document.body.style.background = getBackgroundForLevel(level);
@@ -401,6 +378,9 @@ function levelUp() {
         level++;
         alert(`Congratulations, ${playerName}! You've reached Level ${level}!\n\n${generateFunFact()}`);
         document.body.style.background = getBackgroundForLevel(level);
+
+        playSound(880, 'triangle', 0.5);
+
         updateStatusBar();
         updateMapProgress();
         showStorySegment();
@@ -411,15 +391,15 @@ function levelUp() {
 function getBackgroundForLevel(level) {
     switch (level) {
         case 1:
-            return 'linear-gradient(to bottom, #a8e6cf, #dcedc1)'; // Original
+            return 'linear-gradient(to bottom, #a8e6cf, #dcedc1)';
         case 2:
-            return 'linear-gradient(to bottom, #ffd54f, #ffb300)'; // Sunny meadow
+            return 'linear-gradient(to bottom, #ffd54f, #ffb300)';
         case 3:
-            return 'linear-gradient(to bottom, #ce93d8, #ab47bc)'; // Magical twilight
+            return 'linear-gradient(to bottom, #ce93d8, #ab47bc)';
         case 4:
-            return 'linear-gradient(to bottom, #90caf9, #42a5f5)'; // Enchanted river
+            return 'linear-gradient(to bottom, #90caf9, #42a5f5)';
         case 5:
-            return 'linear-gradient(to bottom, #bcaaa4, #8d6e63)'; // Mystical mountains
+            return 'linear-gradient(to bottom, #bcaaa4, #8d6e63)';
         default:
             return 'linear-gradient(to bottom, #a8e6cf, #dcedc1)';
     }
@@ -432,7 +412,6 @@ function generateFunFact() {
         'Fun Fact: A circle has infinite lines of symmetry.',
         'Interesting! The number 2 is the only even prime number.',
         'Amazing! The Fibonacci sequence appears in nature, such as in the arrangement of leaves on a stem.',
-        // Add more fun facts...
     ];
     return facts[Math.floor(Math.random() * facts.length)];
 }
@@ -455,16 +434,18 @@ function checkAchievements() {
     if (correctAnswers === 1 && !achievements.includes('First Correct Answer')) {
         achievements.push('First Correct Answer');
         alert('Achievement Unlocked: First Correct Answer!');
+        playSound(660, 'square', 0.4);
     }
     if (gemsCollected >= 10 && !achievements.includes('Gem Collector')) {
         achievements.push('Gem Collector');
         alert('Achievement Unlocked: Gem Collector!');
+        playSound(660, 'square', 0.4);
     }
     if (level === maxLevel && !achievements.includes('Math Master')) {
         achievements.push('Math Master');
         alert('Achievement Unlocked: Math Master!');
+        playSound(660, 'square', 0.4);
     }
-    // Add more achievements as desired
 }
 
 function updateMapProgress() {
@@ -490,5 +471,4 @@ function checkForMiniGame() {
 
 function startMiniGame() {
     alert('Bonus Round! Solve as many problems as you can in 60 seconds!');
-    // Implement mini-game logic here
 }
