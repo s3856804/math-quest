@@ -1,474 +1,373 @@
-let character = '';
-let playerName = '';
-let level = 1;
-let gemsCollected = 0;
-let currentQuestion = {};
-let incorrectAttempts = 0;
-let totalQuestions = 10; // Total number of questions per level
-let questionHistory = [];
-let currentQuestionIndex = -1;
-let correctAnswers = 0;
-let incorrectAnswers = 0;
-const maxLevel = 5;
-const gemsPerLevel = 5; // Number of gems needed to level up
-let achievements = [];
-let miniGamePlayed = false;
+// Medical Imaging Website JavaScript
 
-const positiveFeedback = [
-    'Great job!',
-    'Fantastic!',
-    'You got it!',
-    'Keep it up!',
-];
+// Navigation functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const navbar = document.getElementById('navbar');
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    const navLinks = document.querySelectorAll('.nav-link');
 
-const tryAgainMessages = [
-    'Almost there!',
-    'You can do it!',
-    'Give it another try!',
-];
-
-// Function to play sound using Web Audio API
-function playSound(frequency, type = 'sine', duration = 0.2) {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-}
-
-function goToCharacterSelection() {
-    document.getElementById('intro-screen').style.display = 'none';
-    document.getElementById('character-screen').style.display = 'block';
-}
-
-function selectCharacter(selectedCharacter) {
-    character = selectedCharacter;
-    playerName = document.getElementById('player-name').value.trim() || 'Adventurer';
-
-    const avatarColor = document.getElementById('avatar-color').value;
-    document.documentElement.style.setProperty('--avatar-color', avatarColor);
-
-    document.getElementById('character-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
-    document.getElementById('display-name').textContent = playerName;
-    updateStatusBar();
-    showStorySegment();
-    generateQuestion();
-}
-
-function updateStatusBar() {
-    document.getElementById('level').textContent = level;
-    document.getElementById('gems').textContent = gemsCollected;
-}
-
-function generateQuestion(isGoingBack = false) {
-    if (!isGoingBack) {
-        currentQuestionIndex++;
-    }
-
-    if (currentQuestionIndex >= totalQuestions) {
-        currentQuestionIndex = 0;
-        levelUp();
-    }
-
-    const creatures = ['Rabbit', 'Owl', 'Fox', 'Squirrel', 'Deer'];
-    const creature = creatures[Math.floor(Math.random() * creatures.length)];
-
-    const creatureElement = document.getElementById('creature');
-    creatureElement.innerHTML = '';
-    creatureElement.className = 'creature';
-    creatureElement.classList.add(creature.toLowerCase());
-
-    let operator = getOperator(level);
-    let num1, num2;
-
-    if (operator === '×') {
-        num1 = getRandomNumber(1, 9);
-        num2 = getRandomNumber(1, 9);
-    } else if (operator === '÷') {
-        num2 = getRandomNumber(1, 9);
-        let temp = getRandomNumber(level);
-        num1 = num2 * temp;
-    } else {
-        num1 = getRandomNumber(level);
-        num2 = getRandomNumber(level);
-    }
-
-    if (operator === '-') {
-        if (num1 < num2) {
-            [num1, num2] = [num2, num1];
+    // Mobile menu toggle
+    navToggle.addEventListener('click', function() {
+        navMenu.classList.toggle('active');
+        
+        // Animate hamburger menu
+        const bars = navToggle.querySelectorAll('.bar');
+        bars.forEach(bar => bar.style.transition = 'all 0.3s ease');
+        
+        if (navMenu.classList.contains('active')) {
+            bars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+            bars[1].style.opacity = '0';
+            bars[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+        } else {
+            bars[0].style.transform = 'none';
+            bars[1].style.opacity = '1';
+            bars[2].style.transform = 'none';
         }
-    }
+    });
 
-    let questionText = `${num1} ${operator} ${num2}`;
-    let correctAnswer = calculateAnswer(num1, num2, operator);
+    // Close mobile menu when clicking on a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            const bars = navToggle.querySelectorAll('.bar');
+            bars[0].style.transform = 'none';
+            bars[1].style.opacity = '1';
+            bars[2].style.transform = 'none';
+        });
+    });
 
-    currentQuestion = {
-        question: `${creature}: Hello ${playerName}! What is ${questionText}?`,
-        answer: correctAnswer,
-        userAnswer: '',
-        isAnswered: false,
-        isCorrect: false,
-        operator: operator
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Smooth scrolling for navigation links
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                const offsetTop = targetSection.offsetTop - 70; // Account for fixed navbar
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Initialize animations
+    initScrollAnimations();
+    
+    // Initialize appointment form
+    initAppointmentForm();
+    
+    // Initialize service cards interaction
+    initServiceCards();
+});
+
+// Scroll animations
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     };
 
-    questionHistory[currentQuestionIndex] = { ...currentQuestion };
-
-    updateProgress();
-
-    document.getElementById('question').textContent = currentQuestion.question;
-    document.getElementById('answer').value = currentQuestion.userAnswer || '';
-    document.getElementById('feedback').textContent = '';
-
-    const answerInput = document.getElementById('answer');
-    answerInput.focus();
-
-    answerInput.removeEventListener('keydown', handleKeyDown);
-    answerInput.addEventListener('keydown', handleKeyDown);
-}
-
-function handleKeyDown(event) {
-    if (event.key === 'Enter') {
-        submitAnswer();
-    }
-}
-
-function getRandomNumber(level, maxNumber = null) {
-    if (maxNumber !== null) {
-        return Math.floor(Math.random() * maxNumber) + 1;
-    } else {
-        let max = level * 10;
-        return Math.floor(Math.random() * max) + 1;
-    }
-}
-
-function getOperator(level) {
-    let operators = ['+', '-'];
-    if (level >= 2) {
-        operators.push('×');
-    }
-    if (level >= 3) {
-        operators.push('÷');
-    }
-    return operators[Math.floor(Math.random() * operators.length)];
-}
-
-function calculateAnswer(num1, num2, operator) {
-    switch (operator) {
-        case '+':
-            return num1 + num2;
-        case '-':
-            return num1 - num2;
-        case '×':
-            return num1 * num2;
-        case '÷':
-            return num1 / num2;
-    }
-}
-
-function submitAnswer() {
-    const userAnswer = parseFloat(document.getElementById('answer').value);
-    currentQuestion.userAnswer = userAnswer;
-
-    if (userAnswer === currentQuestion.answer) {
-        if (!currentQuestion.isAnswered) {
-            correctAnswers++;
-            currentQuestion.isCorrect = true;
-            currentQuestion.isAnswered = true;
-
-            gemsCollected++;
-            document.getElementById('gems').textContent = gemsCollected;
-
-            playSound(440, 'sine', 0.3);
-
-            checkAchievements();
-
-            if (gemsCollected % gemsPerLevel === 0) {
-                levelUp();
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-on-scroll');
             }
-        }
-        incorrectAttempts = 0;
-        displayFeedback('Correct!', true);
-        generateQuestion();
-    } else {
-        if (!currentQuestion.isAnswered || !currentQuestion.isCorrect) {
-            if (!currentQuestion.isAnswered) {
-                incorrectAnswers++;
-            }
-            currentQuestion.isCorrect = false;
-            currentQuestion.isAnswered = true;
-        }
-        incorrectAttempts++;
+        });
+    }, observerOptions);
 
-        playSound(220, 'sawtooth', 0.3);
+    // Observe service cards
+    const serviceCards = document.querySelectorAll('.service-card');
+    serviceCards.forEach(card => {
+        observer.observe(card);
+    });
 
-        displayFeedback('Try again!', false);
-        if (incorrectAttempts >= 3) {
-            displayHint();
-            incorrectAttempts = 0;
-        }
-    }
+    // Observe tech items
+    const techItems = document.querySelectorAll('.tech-item');
+    techItems.forEach(item => {
+        observer.observe(item);
+    });
 
-    updateProgress();
-}
-
-function displayFeedback(message, isCorrect) {
-    const feedbackEl = document.getElementById('feedback');
-    const randomMessage = isCorrect
-        ? positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)]
-        : tryAgainMessages[Math.floor(Math.random() * tryAgainMessages.length)];
-    feedbackEl.textContent = randomMessage;
-    feedbackEl.className = isCorrect ? 'green' : 'red';
-}
-
-function displayHint() {
-    alert('Hint: Remember to follow the order of operations (PEMDAS).');
-}
-
-function updateProgress() {
-    document.getElementById('correct-answers').textContent = correctAnswers;
-    document.getElementById('incorrect-answers').textContent = incorrectAnswers;
-    document.getElementById('remaining-questions').textContent = totalQuestions - currentQuestionIndex - 1;
-
-    const progressPercentage = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-    document.getElementById('progress').style.width = progressPercentage + '%';
-}
-
-function goBack() {
-    if (currentQuestionIndex > 0) {
-        if (currentQuestion.isAnswered) {
-            if (currentQuestion.isCorrect) {
-                correctAnswers--;
-                gemsCollected--;
-                document.getElementById('gems').textContent = gemsCollected;
-            } else {
-                incorrectAnswers--;
-            }
-            currentQuestion.isAnswered = false;
-            currentQuestion.isCorrect = false;
-        }
-
-        currentQuestionIndex -= 1;
-        currentQuestion = questionHistory[currentQuestionIndex];
-        generateQuestion(true);
-        updateProgress();
-    } else {
-        alert('You are at the first question.');
-    }
-}
-
-function saveGame() {
-    const gameState = {
-        character,
-        playerName,
-        level,
-        gemsCollected,
-        currentQuestionIndex,
-        correctAnswers,
-        incorrectAnswers,
-        questionHistory,
-        incorrectAttempts,
-        background: document.body.style.background,
-        achievements,
-        miniGamePlayed
-    };
-    localStorage.setItem('savedGame', JSON.stringify(gameState));
-    alert('Game saved successfully!');
-}
-
-function loadGame() {
-    const savedGame = JSON.parse(localStorage.getItem('savedGame'));
-    if (savedGame) {
-        character = savedGame.character;
-        playerName = savedGame.playerName;
-        level = savedGame.level;
-        gemsCollected = savedGame.gemsCollected;
-        currentQuestionIndex = savedGame.currentQuestionIndex;
-        correctAnswers = savedGame.correctAnswers;
-        incorrectAnswers = savedGame.incorrectAnswers;
-        questionHistory = savedGame.questionHistory;
-        incorrectAttempts = savedGame.incorrectAttempts;
-        document.body.style.background = savedGame.background;
-        achievements = savedGame.achievements || [];
-        miniGamePlayed = savedGame.miniGamePlayed || false;
-
-        document.getElementById('display-name').textContent = playerName;
-        document.getElementById('intro-screen').style.display = 'none';
-        document.getElementById('character-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'block';
-        updateStatusBar();
-        updateProgress();
-        generateQuestion(true);
-    } else {
-        alert('No saved game found.');
-    }
-}
-
-function endGame() {
-    document.getElementById('game-screen').style.display = 'none';
-    document.getElementById('end-screen').style.display = 'block';
-    document.getElementById('total-gems').textContent = gemsCollected;
-    document.getElementById('final-name').textContent = playerName;
-
-    saveHighScore(playerName, gemsCollected);
-    displayHighScores();
-    displayAchievements();
-}
-
-function displayAchievements() {
-    const achievementList = document.getElementById('achievement-list');
-    achievementList.innerHTML = '';
-    achievements.forEach(achievement => {
-        const listItem = document.createElement('li');
-        listItem.textContent = achievement;
-        achievementList.appendChild(listItem);
+    // Observe other elements
+    const elementsToAnimate = document.querySelectorAll('.about-text, .about-image');
+    elementsToAnimate.forEach(element => {
+        observer.observe(element);
     });
 }
 
-function saveHighScore(name, score) {
-    let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-    highScores.push({ name: name, score: score });
-    highScores.sort((a, b) => b.score - a.score);
-    highScores = highScores.slice(0, 5);
-    localStorage.setItem('highScores', JSON.stringify(highScores));
-}
-
-function displayHighScores() {
-    let highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-    const leaderboardEntries = document.getElementById('leaderboard-entries');
-    leaderboardEntries.innerHTML = '';
-    highScores.forEach(scoreEntry => {
-        const entry = document.createElement('p');
-        entry.textContent = `${scoreEntry.name}: ${scoreEntry.score} gems`;
-        leaderboardEntries.appendChild(entry);
+// Service cards interaction
+function initServiceCards() {
+    const serviceCards = document.querySelectorAll('.service-card');
+    
+    serviceCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            // Add subtle animation or effect
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
     });
 }
 
-function restartGame() {
-    character = '';
-    playerName = '';
-    level = 1;
-    gemsCollected = 0;
-    currentQuestion = {};
-    incorrectAttempts = 0;
-    totalQuestions = 10;
-    questionHistory = [];
-    currentQuestionIndex = -1;
-    correctAnswers = 0;
-    incorrectAnswers = 0;
-    achievements = [];
-    miniGamePlayed = false;
-    localStorage.removeItem('savedGame');
-    document.getElementById('end-screen').style.display = 'none';
-    document.getElementById('intro-screen').style.display = 'block';
-    document.body.style.background = getBackgroundForLevel(level);
+// Appointment form functionality
+function initAppointmentForm() {
+    const form = document.getElementById('appointment-form');
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('preferred-date');
+    
+    // Set minimum date to today
+    dateInput.setAttribute('min', today);
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(form);
+        const appointmentData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            service: formData.get('service'),
+            date: formData.get('date'),
+            message: formData.get('message')
+        };
+        
+        // Validate form
+        if (validateAppointmentForm(appointmentData)) {
+            submitAppointment(appointmentData);
+        }
+    });
 }
 
-function levelUp() {
-    if (level < maxLevel) {
-        level++;
-        alert(`Congratulations, ${playerName}! You've reached Level ${level}!\n\n${generateFunFact()}`);
-        document.body.style.background = getBackgroundForLevel(level);
-
-        playSound(880, 'triangle', 0.5);
-
-        updateStatusBar();
-        updateMapProgress();
-        showStorySegment();
-        checkForMiniGame();
+// Form validation
+function validateAppointmentForm(data) {
+    const errors = [];
+    
+    if (!data.name || data.name.trim().length < 2) {
+        errors.push('Please enter a valid name');
     }
-}
-
-function getBackgroundForLevel(level) {
-    switch (level) {
-        case 1:
-            return 'linear-gradient(to bottom, #a8e6cf, #dcedc1)';
-        case 2:
-            return 'linear-gradient(to bottom, #ffd54f, #ffb300)';
-        case 3:
-            return 'linear-gradient(to bottom, #ce93d8, #ab47bc)';
-        case 4:
-            return 'linear-gradient(to bottom, #90caf9, #42a5f5)';
-        case 5:
-            return 'linear-gradient(to bottom, #bcaaa4, #8d6e63)';
-        default:
-            return 'linear-gradient(to bottom, #a8e6cf, #dcedc1)';
+    
+    if (!data.email || !isValidEmail(data.email)) {
+        errors.push('Please enter a valid email address');
     }
-}
-
-function generateFunFact() {
-    const facts = [
-        'Did you know? Zero is the only number that cannot be represented by Roman numerals.',
-        'Math Fact: The word "hundred" comes from the old Norse term "hundrath," which actually means 120.',
-        'Fun Fact: A circle has infinite lines of symmetry.',
-        'Interesting! The number 2 is the only even prime number.',
-        'Amazing! The Fibonacci sequence appears in nature, such as in the arrangement of leaves on a stem.',
-    ];
-    return facts[Math.floor(Math.random() * facts.length)];
-}
-
-function showStorySegment() {
-    const storySegments = [
-        "Welcome, brave adventurer! The Enchanted Forest is in trouble. A mischievous wizard has confused the creatures with tricky math spells!",
-        "Great job! You've helped the rabbits find their way home. But the journey continues...",
-        "Fantastic! The owls can now see clearly at night. Keep going!",
-        "Amazing work! The foxes are sly again, thanks to you. The wizard is getting worried!",
-        "You've reached the wizard's tower. One final challenge awaits to restore harmony!",
-    ];
-
-    if (level <= storySegments.length) {
-        alert(storySegments[level - 1]);
+    
+    if (!data.phone || data.phone.trim().length < 10) {
+        errors.push('Please enter a valid phone number');
     }
+    
+    if (!data.service) {
+        errors.push('Please select a service');
+    }
+    
+    if (!data.date) {
+        errors.push('Please select a preferred date');
+    }
+    
+    if (errors.length > 0) {
+        showNotification('Please correct the following errors:\n' + errors.join('\n'), 'error');
+        return false;
+    }
+    
+    return true;
 }
 
-function checkAchievements() {
-    if (correctAnswers === 1 && !achievements.includes('First Correct Answer')) {
-        achievements.push('First Correct Answer');
-        alert('Achievement Unlocked: First Correct Answer!');
-        playSound(660, 'square', 0.4);
-    }
-    if (gemsCollected >= 10 && !achievements.includes('Gem Collector')) {
-        achievements.push('Gem Collector');
-        alert('Achievement Unlocked: Gem Collector!');
-        playSound(660, 'square', 0.4);
-    }
-    if (level === maxLevel && !achievements.includes('Math Master')) {
-        achievements.push('Math Master');
-        alert('Achievement Unlocked: Math Master!');
-        playSound(660, 'square', 0.4);
-    }
+// Email validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
-function updateMapProgress() {
-    const marker = document.getElementById('progress-marker');
-    const positions = [
-        { left: '10%', top: '80%' },
-        { left: '30%', top: '60%' },
-        { left: '50%', top: '40%' },
-        { left: '70%', top: '20%' },
-        { left: '90%', top: '10%' },
-    ];
-    const position = positions[level - 1];
-    marker.style.left = position.left;
-    marker.style.top = position.top;
+// Submit appointment
+function submitAppointment(data) {
+    // Show loading state
+    const submitButton = document.querySelector('#appointment-form button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Submitting...';
+    submitButton.disabled = true;
+    
+    // Simulate API call (replace with actual backend integration)
+    setTimeout(() => {
+        // Reset button
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+        
+        // Show success message
+        showNotification('Appointment request submitted successfully! We will contact you soon to confirm your appointment.', 'success');
+        
+        // Reset form
+        document.getElementById('appointment-form').reset();
+        
+        // Optional: Send email using EmailJS (if configured)
+        sendEmailNotification(data);
+        
+    }, 2000);
 }
 
-function checkForMiniGame() {
-    if (level === 3 && !miniGamePlayed) {
-        miniGamePlayed = true;
-        startMiniGame();
+// Email notification (using EmailJS)
+function sendEmailNotification(appointmentData) {
+    // This would require EmailJS configuration
+    // emailjs.send('service_id', 'template_id', appointmentData)
+    //     .then(function(response) {
+    //         console.log('Email sent successfully:', response);
+    //     })
+    //     .catch(function(error) {
+    //         console.log('Email send failed:', error);
+    //     });
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 10000;
+        max-width: 400px;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        transform: translateX(100%);
+        ${type === 'success' ? 'background: #10b981; color: white;' : ''}
+        ${type === 'error' ? 'background: #ef4444; color: white;' : ''}
+        ${type === 'info' ? 'background: #3b82f6; color: white;' : ''}
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Add close functionality
+    const closeButton = notification.querySelector('.notification-close');
+    closeButton.addEventListener('click', () => {
+        removeNotification(notification);
+    });
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        removeNotification(notification);
+    }, 5000);
+}
+
+function removeNotification(notification) {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
+
+// Statistics counter animation
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const target = counter.textContent;
+        const numTarget = parseInt(target.replace(/[^\d]/g, ''));
+        const suffix = target.replace(/[\d]/g, '');
+        
+        if (numTarget > 0) {
+            let current = 0;
+            const increment = numTarget / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= numTarget) {
+                    counter.textContent = numTarget + suffix;
+                    clearInterval(timer);
+                } else {
+                    counter.textContent = Math.floor(current) + suffix;
+                }
+            }, 50);
+        }
+    });
+}
+
+// Initialize counter animation when hero section is visible
+const heroSection = document.querySelector('.hero');
+const counterObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounters();
+            counterObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+if (heroSection) {
+    counterObserver.observe(heroSection);
+}
+
+// Accessibility enhancements
+document.addEventListener('keydown', function(e) {
+    // ESC key closes mobile menu
+    if (e.key === 'Escape') {
+        const navMenu = document.getElementById('nav-menu');
+        if (navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            const navToggle = document.getElementById('nav-toggle');
+            const bars = navToggle.querySelectorAll('.bar');
+            bars[0].style.transform = 'none';
+            bars[1].style.opacity = '1';
+            bars[2].style.transform = 'none';
+        }
     }
+});
+
+// Performance optimization: Lazy load images
+function initLazyLoading() {
+    const images = document.querySelectorAll('img[data-src]');
+    
+    const imageObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+    
+    images.forEach(img => imageObserver.observe(img));
 }
 
-function startMiniGame() {
-    alert('Bonus Round! Solve as many problems as you can in 60 seconds!');
+// Initialize when DOM is loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLazyLoading);
+} else {
+    initLazyLoading();
 }

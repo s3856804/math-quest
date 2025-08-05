@@ -2,112 +2,330 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Math Quest: The Enchanted Forest Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro Medical Imaging - Advanced Diagnostic Services</title>
+    <meta name="description" content="State-of-the-art medical imaging services including MRI, CT, X-ray, and ultrasound. Professional diagnostic imaging with latest technology and expert radiologists.">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Intro Screen -->
-        <div id="intro-screen">
-            <h1>Math Quest</h1>
-            <p>Welcome to the Enchanted Forest, where math and magic meet!</p>
-            <p>Can you help restore harmony by solving the challenges ahead?</p>
-            <button onclick="goToCharacterSelection()">Begin Your Adventure</button>
-            <button onclick="loadGame()">Load Saved Game</button>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwMDY2RkYiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMlM2LjQ4IDIyIDEyIDIyUzIyIDE3LjUyIDIyIDEyUzE3LjUyIDIgMTIgMlpNMTMgMTdIMTFWMTVIMTNWMTdaTTEzIDEzSDE1VjExSDEzVjEzWiIgZmlsbD0id2hpdGUiLz4KPHN2Zz4KPHN2Zz4=" alt="Astro Medical Imaging Logo" class="logo">
+                <span class="brand-text">Astro Medical Imaging</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#technology" class="nav-link">Technology</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="#appointment" class="nav-link cta-link">Book Appointment</a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
+    </nav>
 
-        <!-- Character Selection Screen -->
-        <div id="character-screen" style="display: none;">
-            <h2>Choose Your Character</h2>
-            <input type="text" id="player-name" placeholder="Enter your name">
-            <div class="character-selection">
-                <div class="character-option" onclick="selectCharacter('knight')">
-                    <div class="avatar knight" id="knight-avatar"></div>
-                    <p>Knight</p>
-                </div>
-                <div class="character-option" onclick="selectCharacter('wizard')">
-                    <div class="avatar wizard" id="wizard-avatar"></div>
-                    <p>Wizard</p>
-                </div>
-                <div class="character-option" onclick="selectCharacter('explorer')">
-                    <div class="avatar explorer" id="explorer-avatar"></div>
-                    <p>Explorer</p>
-                </div>
-                <!-- More avatar options -->
-                <div class="character-option" onclick="selectCharacter('elf')">
-                    <div class="avatar elf" id="elf-avatar"></div>
-                    <p>Elf</p>
-                </div>
-                <div class="character-option" onclick="selectCharacter('fairy')">
-                    <div class="avatar fairy" id="fairy-avatar"></div>
-                    <p>Fairy</p>
-                </div>
-            </div>
-            <p>Customize Your Avatar's Color:</p>
-            <input type="color" id="avatar-color" value="#ff0000">
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
         </div>
-
-        <!-- Game Screen -->
-        <div id="game-screen" style="display: none;">
-            <div class="status-bar">
-                <div>Level: <span id="level">1</span></div>
-                <div>Gems: <span id="gems">0</span></div>
-                <div>Name: <span id="display-name"></span></div>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar">
-                    <div class="progress" id="progress"></div>
+        <div class="hero-content">
+            <div class="container">
+                <h1 class="hero-title">
+                    Advanced Medical Imaging
+                    <span class="highlight">Excellence</span>
+                </h1>
+                <p class="hero-subtitle">
+                    State-of-the-art diagnostic imaging services with cutting-edge technology 
+                    and expert radiologists providing accurate, timely results.
+                </p>
+                <div class="hero-actions">
+                    <a href="#appointment" class="btn btn-primary">Book Appointment</a>
+                    <a href="#services" class="btn btn-secondary">Our Services</a>
                 </div>
-                <div class="progress-info">
-                    <span>Correct: <span id="correct-answers">0</span></span>
-                    <span>Incorrect: <span id="incorrect-answers">0</span></span>
-                    <span>Remaining: <span id="remaining-questions">10</span></span>
-                </div>
-            </div>
-            <div class="game-area">
-                <div class="map" id="map">
-                    <div id="progress-marker"></div>
-                </div>
-                <div class="interaction-area">
-                    <div id="creature" class="creature"></div>
-                    <p id="question"></p>
-                    <input type="number" id="answer" placeholder="Your answer" autocomplete="off">
-                    <button onclick="submitAnswer()">Submit</button>
-                    <div id="feedback"></div>
-                    <div class="game-buttons">
-                        <button onclick="goBack()">Go Back</button>
-                        <button onclick="saveGame()">Save</button>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">25+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">50,000+</span>
+                        <span class="stat-label">Scans Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Emergency Service</span>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- End Screen -->
-        <div id="end-screen" style="display: none;">
-            <h2>Congratulations, <span id="final-name"></span>!</h2>
-            <p>You have restored harmony to the Enchanted Forest!</p>
-            <p>Total Gems Collected: <span id="total-gems"></span></p>
-            <div id="achievements">
-                <h3>Your Achievements</h3>
-                <ul id="achievement-list"></ul>
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Services</h2>
+                <p class="section-subtitle">Comprehensive diagnostic imaging services using the latest technology</p>
             </div>
-            <div id="leaderboard">
-                <h3>Leaderboard</h3>
-                <div id="leaderboard-entries"></div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z" fill="#0066FF"/>
+                            <circle cx="12" cy="12" r="4" fill="#0066FF"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">MRI Scans</h3>
+                    <p class="service-description">High-resolution magnetic resonance imaging for detailed soft tissue visualization with our 3T MRI scanner.</p>
+                    <ul class="service-features">
+                        <li>3 Tesla high-field MRI</li>
+                        <li>Short bore design for comfort</li>
+                        <li>Advanced sequences available</li>
+                        <li>Same-day reporting</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L3 7V10.33C3 16.26 7.14 21.8 12 22.96C16.86 21.8 21 16.26 21 10.33V7L12 2Z" fill="#0066FF"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">CT Scans</h3>
+                    <p class="service-description">Fast, accurate computed tomography imaging with low radiation dose technology for comprehensive diagnosis.</p>
+                    <ul class="service-features">
+                        <li>128-slice CT scanner</li>
+                        <li>Low-dose protocols</li>
+                        <li>Cardiac CT available</li>
+                        <li>3D reconstruction</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M14.06 9.02L14.98 9.94L5.92 19H5V18.08L14.06 9.02ZM17.66 3C17.41 3 17.15 3.1 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C18.17 3.09 17.92 3 17.66 3Z" fill="#0066FF"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">X-Ray</h3>
+                    <p class="service-description">Digital radiography providing instant, high-quality images with minimal radiation exposure.</p>
+                    <ul class="service-features">
+                        <li>Digital X-ray systems</li>
+                        <li>Immediate image availability</li>
+                        <li>Reduced radiation exposure</li>
+                        <li>Portable options available</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#0066FF"/>
+                        </svg>
+                    </div>
+                    <h3 class="service-title">Ultrasound</h3>
+                    <p class="service-description">Non-invasive ultrasound imaging for real-time visualization of organs and blood flow assessment.</p>
+                    <ul class="service-features">
+                        <li>3D/4D ultrasound capability</li>
+                        <li>Doppler studies</li>
+                        <li>Musculoskeletal imaging</li>
+                        <li>Pregnancy scanning</li>
+                    </ul>
+                </div>
             </div>
-            <button onclick="restartGame()">Play Again</button>
         </div>
-    </div>
+    </section>
 
-    <!-- Include EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){
-          emailjs.init('YOUR_USER_ID'); // Replace with your EmailJS user ID
-       })();
-    </script>
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">About Astro Medical Imaging</h2>
+                    <p class="about-description">
+                        For over 25 years, Astro Medical Imaging has been at the forefront of diagnostic imaging excellence. 
+                        Our commitment to providing the highest quality medical imaging services is backed by cutting-edge 
+                        technology and a team of highly qualified radiologists and technologists.
+                    </p>
+                    <div class="about-highlights">
+                        <div class="highlight-item">
+                            <h4>Expert Team</h4>
+                            <p>Board-certified radiologists with subspecialty training</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>Advanced Technology</h4>
+                            <p>Latest imaging equipment for superior diagnostic accuracy</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>Patient-Centered Care</h4>
+                            <p>Comfortable environment with compassionate service</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="image-placeholder">
+                        <svg width="100%" height="400" viewBox="0 0 600 400" fill="none">
+                            <rect width="600" height="400" fill="#f8fafc"/>
+                            <path d="M150 100h300v200H150z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                            <circle cx="300" cy="200" r="60" fill="#0066FF" opacity="0.1"/>
+                            <circle cx="300" cy="200" r="40" fill="#0066FF" opacity="0.2"/>
+                            <circle cx="300" cy="200" r="20" fill="#0066FF"/>
+                            <text x="300" y="350" text-anchor="middle" fill="#64748b" font-size="16">Modern Medical Facility</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- Your script.js file -->
+    <!-- Technology Section -->
+    <section id="technology" class="technology">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Cutting-Edge Technology</h2>
+                <p class="section-subtitle">We invest in the latest medical imaging technology to provide superior diagnostic capabilities</p>
+            </div>
+            <div class="technology-grid">
+                <div class="tech-item">
+                    <h3>3T MRI Scanner</h3>
+                    <p>High-field strength for exceptional image quality and faster scan times</p>
+                </div>
+                <div class="tech-item">
+                    <h3>128-Slice CT</h3>
+                    <p>Advanced multi-detector technology for comprehensive imaging with minimal radiation</p>
+                </div>
+                <div class="tech-item">
+                    <h3>AI-Enhanced Imaging</h3>
+                    <p>Artificial intelligence assists in image optimization and diagnostic accuracy</p>
+                </div>
+                <div class="tech-item">
+                    <h3>Digital Workflow</h3>
+                    <p>Fully digital PACS system for immediate image availability and remote access</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Appointment Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2 class="section-title">Contact Us</h2>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <h4>Location</h4>
+                            <p>123 Medical Center Drive<br>Brisbane, QLD 4000<br>Australia</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>Phone</h4>
+                            <p>+61 7 3000 0000</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>Email</h4>
+                            <p>info@astromedicalimaging.com.au</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>Hours</h4>
+                            <p>Mon-Fri: 7:00 AM - 7:00 PM<br>Sat: 8:00 AM - 4:00 PM<br>Sun: Emergency only</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="appointment-form" id="appointment">
+                    <h3>Book an Appointment</h3>
+                    <form id="appointment-form">
+                        <div class="form-group">
+                            <label for="patient-name">Full Name</label>
+                            <input type="text" id="patient-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-email">Email</label>
+                            <input type="email" id="patient-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-phone">Phone</label>
+                            <input type="tel" id="patient-phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-type">Service Required</label>
+                            <select id="service-type" name="service" required>
+                                <option value="">Select a service</option>
+                                <option value="mri">MRI Scan</option>
+                                <option value="ct">CT Scan</option>
+                                <option value="xray">X-Ray</option>
+                                <option value="ultrasound">Ultrasound</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferred-date">Preferred Date</label>
+                            <input type="date" id="preferred-date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Additional Information</label>
+                            <textarea id="message" name="message" rows="4" placeholder="Please provide any additional details about your appointment request"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Submit Appointment Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwMDY2RkYiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMlM2LjQ4IDIyIDEyIDIyUzIyIDE3LjUyIDIyIDEyUzE3LjUyIDIgMTIgMlpNMTMgMTdIMTFWMTVIMTNWMTdaTTEzIDEzSDE1VjExSDEzVjEzWiIgZmlsbD0id2hpdGUiLz4KPHN2Zz4KPHN2Zz4KPHN2Zz4=" alt="Astro Medical Imaging" class="footer-logo">
+                        <span class="footer-brand-text">Astro Medical Imaging</span>
+                    </div>
+                    <p class="footer-description">
+                        Leading provider of advanced medical imaging services with over 25 years of excellence in diagnostic imaging.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#services">MRI Scans</a></li>
+                        <li><a href="#services">CT Scans</a></li>
+                        <li><a href="#services">X-Ray</a></li>
+                        <li><a href="#services">Ultrasound</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#technology">Technology</a></li>
+                        <li><a href="#appointment">Book Appointment</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <div class="footer-contact">
+                        <p>📍 123 Medical Center Drive<br>Brisbane, QLD 4000</p>
+                        <p>📞 +61 7 3000 0000</p>
+                        <p>✉️ info@astromedicalimaging.com.au</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Astro Medical Imaging. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
